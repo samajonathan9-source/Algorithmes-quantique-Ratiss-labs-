@@ -12,6 +12,18 @@ Le circuit idéal augmente la masse de l’état marqué à deux itérations dan
 
 > Le résultat est une simulation locale. Il ne correspond pas à une exécution QPU et ne transforme pas le sidecar topologique en composant physique.
 
+## Grover Reality Mode : transpilation et divergence déclarées
+
+Le fichier [`artifacts/grover_reality_mode.json`](../artifacts/grover_reality_mode.json) utilise un snapshot local de `FakeSherbrooke` pour transpiler le même circuit Grover vers une topologie et un modèle de bruit empaquetés. L’allocation déclarée `[0, 14, 26]` entraîne une forte augmentation de profondeur après décomposition, même si aucun `swap` explicite n’est exporté par le transpileur dans cette exécution.
+
+| Itération | Masse idéale | Masse observée | Profondeur compilée | Taille compilée | Divergence LCT | Reality Flag nominal |
+|---:|---:|---:|---:|---:|---:|---|
+| 0 | 0.117188 | 0.121094 | 4 | 12 | 0.000000 | Non |
+| 1 | 0.769531 | 0.339844 | 330 | 770 | 0.015701 | Non |
+| 2 | 0.962891 | 0.298828 | 533 | 1102 | 0.043696 | Non |
+
+Le `P_sig` de l’association de counts est `0.0` aux trois étapes et reste inchangé. Il ne devient pas le `P_sig` du sidecar. Avec un seuil nominal de `0.15`, aucune divergence ne déclenche le Reality Flag. Le scénario séparé [`grover_reality_mode_sensitivity.json`](../artifacts/grover_reality_mode_sensitivity.json), dont le seul seuil passe à `0.02`, déclenche le flag à l’itération 2. Cette sortie mesure une condition de simulation locale, non une anomalie sur matériel IBM.
+
 ## Reproduction
 
 ```bash
@@ -19,8 +31,15 @@ PYTHONPATH=/path/to/ratiss-topological-decoherence-engine/src \
 python3 scripts/run_grover_ratiss.py \
   --engine-src /path/to/ratiss-topological-decoherence-engine/src \
   --output artifacts/grover_ratiss.json --shots 512
+
+PYTHONPATH=/path/to/ratiss-topological-decoherence-engine/src \
+python3 scripts/run_grover_reality_mode.py \
+  --engine-src /path/to/ratiss-topological-decoherence-engine/src \
+  --output artifacts/grover_reality_mode.json
 ```
 
 ## Référence
 
 [1] [Qiskit — grover_operator](https://quantum.cloud.ibm.com/docs/api/qiskit/qiskit.circuit.library.grover_operator)
+
+[2] [Qiskit IBM Runtime — fake provider](https://quantum.cloud.ibm.com/docs/en/api/qiskit-ibm-runtime/fake-provider)

@@ -3,3 +3,5 @@ __pycache__/
 artifacts/*.json
 !artifacts/.gitkeep
 !artifacts/grover_ratiss.json
+!artifacts/grover_reality_mode.json
+!artifacts/grover_reality_mode_sensitivity.json
