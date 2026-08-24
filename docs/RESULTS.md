@@ -4,11 +4,13 @@ La première exécution locale a utilisé Qiskit Aer, seed `42`, un bruit dépol
 
 | Itération Grover | Profondeur | Masse marquée idéale `111` | Masse marquée bruitée `111` | P sig logique RATISS | Cohérence logicielle |
 |---:|---:|---:|---:|---:|---:|
-| 0 | 2 | 0.117188 | 0.107422 | 1.214413 | 1.00 |
-| 1 | 10 | 0.769531 | 0.669922 | 0.763344 | 0.98 |
-| 2 | 18 | 0.962891 | 0.677734 | 0.768691 | 0.96 |
+| 0 | 2 | 0.117188 | 0.107422 | 0.182162 | 1.00 |
+| 1 | 10 | 0.769531 | 0.669922 | 0.646956 | 0.98 |
+| 2 | 18 | 0.962891 | 0.677734 | 0.668866 | 0.96 |
 
 Le circuit idéal augmente la masse de l’état marqué à deux itérations dans cette construction. La version bruitée montre une masse plus faible à ces mêmes étapes. Le sidecar RATISS est exposé en parallèle et demeure marqué `protected=true` selon sa règle algorithmique ; cette sortie ne constitue pas une preuve que la LCT améliore Grover ou corrige son bruit.
+
+> **Correction de sidecar (moteur PR #1).** Les artefacts précédents affichaient une signature initiale de `1.214413` : cette valeur provenait d’un bug connu du `TopologicalQubit` (cycles dégénérés naissance≈mort comptés comme valides), corrigé dans le moteur. L’anneau compact non tordu donne désormais `P_sig ≈ 0.18` — la valeur corrigée. Les artefacts de ce dépôt ont été régénérés avec le moteur corrigé.
 
 > Le résultat est une simulation locale. Il ne correspond pas à une exécution QPU et ne transforme pas le sidecar topologique en composant physique.
 
@@ -19,10 +21,10 @@ Le fichier [`artifacts/grover_reality_mode.json`](../artifacts/grover_reality_mo
 | Itération | Masse idéale | Masse observée | Profondeur compilée | Taille compilée | Divergence LCT | Reality Flag nominal |
 |---:|---:|---:|---:|---:|---:|---|
 | 0 | 0.117188 | 0.121094 | 4 | 12 | 0.000000 | Non |
-| 1 | 0.769531 | 0.339844 | 330 | 770 | 0.015701 | Non |
-| 2 | 0.962891 | 0.298828 | 533 | 1102 | 0.043696 | Non |
+| 1 | 0.769531 | 0.339844 | 330 | 770 | 0.169988 | **Oui** |
+| 2 | 0.962891 | 0.298828 | 533 | 1102 | 0.526472 | **Oui** |
 
-Le `P_sig` de l’association de counts est `0.0` aux trois étapes et reste inchangé. Il ne devient pas le `P_sig` du sidecar. Avec un seuil nominal de `0.15`, aucune divergence ne déclenche le Reality Flag. Le scénario séparé [`grover_reality_mode_sensitivity.json`](../artifacts/grover_reality_mode_sensitivity.json), dont le seul seuil passe à `0.02`, déclenche le flag à l’itération 2. Cette sortie mesure une condition de simulation locale, non une anomalie sur matériel IBM.
+Le `P_sig` de l’association de counts est `0.0` aux trois étapes et reste inchangé. Il ne devient pas le `P_sig` du sidecar. Depuis la correction du sidecar (moteur PR #1), le `P_sig` attendu est mesuré sur l’anneau compact réel (`≈0.18`) et l’amplitude de bruit `0.2` rend la dégradation observée réellement sensible : la divergence calculée franchit le seuil nominal `0.15` aux itérations 1 et 2, et le Reality Flag se déclenche à ces deux étapes. Le scénario séparé [`grover_reality_mode_sensitivity.json`](../artifacts/grover_reality_mode_sensitivity.json), dont le seul seuil passe à `0.02`, se déclenche aux mêmes itérations. Cette sortie mesure une condition de simulation locale, non une anomalie sur matériel IBM.
 
 ## Reproduction
 

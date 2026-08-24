@@ -1,75 +1,112 @@
-# Algorithmes quantique RATISS labs
+<p align="center">
+  <img src="docs/brand/ratiss-labs-grover-logo.png" alt="RATISS Labs — Grover amplification of |111⟩ inside the topological sidecar ring" width="240"/>
+</p>
 
-# Algorithmes quantiques RATISS Labs
+<h1 align="center">Algorithmes quantiques RATISS Labs</h1>
 
-> **Banc d’expériences de circuits quantiques** — Grover sous simulation Aer, comparaison idéal/bruité et lecture séparée d’un sidecar topologique RATISS.
+<p align="center">
+  <strong>Banc d'expériences de circuits quantiques</strong><br/>
+  Grover sous simulation Aer · comparaison idéal/bruité · Reality Mode hardware-aware —<br/>
+  sidecar topologique RATISS lu dans un flux strictement séparé.
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="Licence MIT" src="https://img.shields.io/badge/Licence-MIT-42d6ad?style=for-the-badge"></a>
+  <img alt="Python ≥ 3.11" src="https://img.shields.io/badge/Python-%E2%89%A5%203.11-79b8ff?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="Qiskit 2.5.2" src="https://img.shields.io/badge/Qiskit-2.5.2-6929c4?style=for-the-badge&logo=ibm&logoColor=white">
+  <img alt="Qiskit Aer 0.17.2" src="https://img.shields.io/badge/Qiskit%20Aer-0.17.2-6929c4?style=for-the-badge&logo=ibm&logoColor=white">
+  <img alt="Qiskit IBM Runtime 0.49.0" src="https://img.shields.io/badge/IBM%20Runtime-0.49.0-6929c4?style=for-the-badge&logo=ibm&logoColor=white">
+  <img alt="Reproductibilité déterministe" src="https://img.shields.io/badge/Reproductibilit%C3%A9-d%C3%A9terministe-ff927d?style=for-the-badge">
+</p>
+
+<p align="center">
+  <em>Architecte & investigateur principal : <strong>Jonathan Evina</strong> ·
+  <a href="https://orcid.org/0009-0000-4092-5313">ORCID 0009-0000-4092-5313</a></em>
+</p>
+
+---
+
+## Sommaire
+
+1. [Nature du banc d'expériences](#1-nature-du-banc-dexpériences)
+2. [Frontière de revendication](#2-frontière-de-revendication)
+3. [Expérience 1 — Grover et sidecar RATISS](#3-expérience-1--grover-et-sidecar-ratiss)
+4. [Expérience 2 — Reality Mode hardware-aware](#4-expérience-2--reality-mode-hardware-aware)
+5. [Correction de sidecar et régénération](#5-correction-de-sidecar-et-régénération)
+6. [Pile technologique](#6-pile-technologique)
+7. [Exécution et reproduction](#7-exécution-et-reproduction)
+8. [Tests](#8-tests)
+9. [Documentation du laboratoire](#9-documentation-du-laboratoire)
+10. [Citation et licence](#10-citation-et-licence)
+
+---
+
+## 1. Nature du banc d'expériences
+
+Ce laboratoire vérifie concrètement une trajectoire simple : un oracle de phase et la diffusion Grover amplifient l'état marqué `|111⟩` dans le simulateur idéal ; un canal de bruit déclaré modifie la distribution. Le côté RATISS ne remplace pas Grover : il produit un **second flux de variables topologiques logicielles**, explicitement séparé de l'algorithme quantique.
 
 | Type de projet | Objet quantique | Objet RATISS | Produit de recherche |
 |---|---|---|---|
-| Algorithme quantique reproductible | Recherche Grover, oracle de phase pour `|111⟩` | `TopologicalQubit` algorithmique | Counts, masse de l’état marqué, phase, cohérence et `P_sig` logique |
+| Algorithme quantique reproductible | Recherche Grover, oracle de phase pour `|111⟩` | `TopologicalQubit` algorithmique | Counts, masse de l'état marqué, phase, cohérence et `P_sig` logique |
 
-Ce laboratoire vérifie concrètement une trajectoire simple : un oracle de phase et la diffusion Grover amplifient l’état marqué dans le simulateur idéal ; un canal de bruit déclaré modifie la distribution. Le côté RATISS ne remplace pas Grover : il produit un **second flux de variables topologiques logicielles**, explicitement séparé de l’algorithme quantique.
+## 2. Frontière de revendication
 
-> Aucune ligne de ce dépôt ne prétend que la LCT optimise Grover, corrige le bruit ou décrit un qubit topologique matériel. Le sidecar est une simulation algorithmique versionnée.
+> **Aucune ligne de ce dépôt ne prétend que la LCT optimise Grover, corrige le bruit ou décrit un qubit topologique matériel.** Le sidecar est une simulation algorithmique versionnée. Le Reality Mode utilise un faux backend empaqueté (`FakeSherbrooke`) comme source locale de topologie et de bruit ; aucun job QPU n'est soumis, et le Reality Flag n'est pas un diagnostic de matériel réel.
 
-## Visuels issus de l’artefact exécuté
+## 3. Expérience 1 — Grover et sidecar RATISS
 
-![Masse de l’état marqué Grover](docs/assets/grover-marked-mass.png)
+![Masse de l'état marqué Grover](docs/assets/grover-marked-mass.png)
 
-La courbe vert menthe représente les counts Aer idéaux ; la courbe corail vient du même circuit sous bruit CX dépolarisant `p=0.02`. La masse observée de `|111⟩` atteint `0.962891` à l’itération 2 dans l’idéal et `0.677734` sous ce bruit déclaré.
+La courbe vert menthe représente les counts Aer idéaux ; la courbe corail vient du même circuit sous bruit CX dépolarisant `p=0.02`. La masse observée de `|111⟩` atteint `0.962891` à l'itération 2 dans l'idéal et `0.677734` sous ce bruit déclaré.
 
-![Cohérence et P sig du sidecar RATISS](docs/assets/grover-ratiss-sidecar.png)
+![Cohérence et P_sig du sidecar RATISS](docs/assets/grover-ratiss-sidecar.png)
 
-Cette figure ne représente pas une propriété calculée à partir de l’état Grover seul. Elle suit le sidecar `TopologicalQubit` à l’horloge des itérations. Son `P_sig` oscille librement selon ses transformations ; il n’est pas fixé pour suivre la masse Grover.
-
-## Reality Mode Grover : faux backend local et Reality Flag
-
-![Masse observée et divergence LCT Reality Mode](docs/assets/grover-reality-mode.png)
-
-Le Reality Mode ajoute un second protocole, séparé de l’expérience historique : Qiskit transpile Grover vers le *target* et la topologie de couplage empaquetés par `FakeSherbrooke`, puis Aer utilise le modèle de bruit local dérivé de ce faux backend. Aucun job QPU n’est soumis. L’allocation physique déclarée est `[0, 14, 26]` ; la profondeur compilée passe de `4` à `330` puis `533` aux itérations 0, 1 et 2. Le transpileur n’a exporté aucun `swap` explicite dans cette exécution, mais a tout de même décomposé le circuit dans le jeu de portes de la cible.
-
-![Coût de transpilation hardware-aware](docs/assets/grover-hardware-aware.png)
-
-Le moniteur reçoit les counts observés, construit une association de counts RATISS séparée, puis compare la masse marquée et les sidecars idéal/observé. Son **Reality Flag** est une condition LCT déclarée, pas un diagnostic d’un QPU réel. Avec le seuil nominal `0.15`, aucune itération ne déclenche le flag. Un scénario de sensibilité séparé, à seuil `0.02`, le déclenche à l’itération 2 lorsque la divergence calculée vaut `0.0436962248`.
-
-| Itération | Masse idéale | Masse observée fake backend | Profondeur compilée | Divergence LCT nominale | P sig association counts |
-|---:|---:|---:|---:|---:|---:|
-| 0 | 0.117188 | 0.121094 | 4 | 0.000000 | 0.0 |
-| 1 | 0.769531 | 0.339844 | 330 | 0.015701 | 0.0 |
-| 2 | 0.962891 | 0.298828 | 533 | 0.043697 | 0.0 |
-
-## Architecture
-
-```mermaid
-flowchart LR
-  A[Phase oracle for 111] --> B[Grover operator]
-  B --> C[Aer sampling]
-  C --> D[Marked state mass]
-  E[Iteration clock] --> F[RATISS logical sidecar]
-  F --> G[Phase coherence and P sig]
-  B --> I[Fake backend target and noise model]
-  I --> J[Hardware aware transpilation]
-  J --> K[Observed counts association]
-  G --> L[Reality Flag LCT]
-  K --> L
-  D --> H[JSON artifact]
-  G --> H
-  L --> M[Reality Mode artifact]
-```
-
-L’architecture détaillée est dans [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). La séparation des branches de calcul est une contrainte centrale : les résultats Grover et RATISS sont enregistrés dans le même artefact, mais ne sont jamais convertis l’un dans l’autre.
-
-## Résultats calculés
+Cette figure ne représente pas une propriété calculée à partir de l'état Grover seul. Elle suit le sidecar `TopologicalQubit` à l'horloge des itérations. Son `P_sig` oscille librement selon ses transformations ; il n'est pas fixé pour suivre la masse Grover.
 
 | Itération | Masse `|111⟩` idéale | Masse `|111⟩` bruitée | `P_sig` logique RATISS | Cohérence logique |
 |---:|---:|---:|---:|---:|
-| 0 | 0.117188 | 0.107422 | 1.214413 | 1.00 |
-| 1 | 0.769531 | 0.669922 | 0.763344 | 0.98 |
-| 2 | 0.962891 | 0.677734 | 0.768691 | 0.96 |
+| 0 | 0.117188 | 0.107422 | 0.182162 | 1.00 |
+| 1 | 0.769531 | 0.669922 | 0.646956 | 0.98 |
+| 2 | 0.962891 | 0.677734 | 0.668866 | 0.96 |
 
-Ces valeurs viennent de [`artifacts/grover_ratiss.json`](artifacts/grover_ratiss.json), avec seed `42` et `512` tirs. Elles peuvent changer lorsque la configuration, le seed, le bruit, l’oracle ou le nombre de tirs changent ; le dépôt conserve la configuration avec les sorties.
+Ces valeurs viennent de [`artifacts/grover_ratiss.json`](artifacts/grover_ratiss.json), avec seed `42` et `512` tirs. Elles peuvent changer lorsque la configuration, le seed, le bruit, l'oracle ou le nombre de tirs changent ; le dépôt conserve la configuration avec les sorties.
 
-## Exécution locale
+## 4. Expérience 2 — Reality Mode hardware-aware
+
+![Masse observée et divergence LCT Reality Mode](docs/assets/grover-reality-mode.png)
+
+Le Reality Mode ajoute un second protocole, séparé de l'expérience historique : Qiskit transpile Grover vers le *target* et la topologie de couplage empaquetés par `FakeSherbrooke`, puis Aer utilise le modèle de bruit local dérivé de ce faux backend. L'allocation physique déclarée est `[0, 14, 26]` ; la profondeur compilée passe de `4` à `330` puis `533` aux itérations 0, 1 et 2. Le transpileur n'a exporté aucun `swap` explicite dans cette exécution, mais a décomposé le circuit dans le jeu de portes de la cible.
+
+![Coût de transpilation hardware-aware](docs/assets/grover-hardware-aware.png)
+
+Le moniteur reçoit les counts observés, construit une association de counts RATISS séparée, puis compare la masse marquée et les sidecars idéal/observé. Son **Reality Flag** est une condition LCT déclarée, pas un diagnostic d'un QPU réel. Depuis la correction du sidecar (voir §5), le seuil nominal `0.15` est franchi aux itérations 1 et 2 (divergences `0.169988` et `0.526472`) ; le scénario de sensibilité séparé, à seuil `0.02`, se déclenche aux mêmes itérations.
+
+| Itération | Masse idéale | Masse observée fake backend | Profondeur compilée | Divergence LCT nominale | Reality Flag nominal | P_sig association counts |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 0.117188 | 0.121094 | 4 | 0.000000 | Non | 0.0 |
+| 1 | 0.769531 | 0.339844 | 330 | 0.169988 | **Oui** | 0.0 |
+| 2 | 0.962891 | 0.298828 | 533 | 0.526472 | **Oui** | 0.0 |
+
+## 5. Correction de sidecar et régénération
+
+> **Transparence de laboratoire.** Les artefacts précédents affichaient une signature sidecar initiale de `1.214413`. Cette valeur provenait d'un bug connu du `TopologicalQubit` — des cycles dégénérés (naissance ≈ mort, ~1e-16) comptés comme persistants — corrigé dans le moteur ([PR #1](https://github.com/evinajonathan13-max/ratiss-topological-decoherence-engine/pull/1) : tolérance `1e-9`, géométrie dilatante twist 0→π, amplitude de bruit `0.2`). L'anneau compact non tordu donne désormais `P_sig ≈ 0.18`, et le sidecar réagit réellement à la dégradation mesurée. Tous les artefacts de ce dépôt ont été régénérés avec le moteur corrigé ; les valeurs ci-dessus sont les valeurs corrigées, conservées sans ajustement.
+
+## 6. Pile technologique
+
+| Couche | Technologie | Rôle |
+|---|---|---|
+| Langage | Python ≥ 3.11 | Banc d'expériences complet |
+| Simulation quantique | Qiskit 2.5.2 · Qiskit Aer 0.17.2 | Échantillonnage Grover, canaux de bruit déclarés |
+| Faux backend | Qiskit IBM Runtime 0.49.0 (`FakeSherbrooke`) | Target, carte de couplage, modèle de bruit local — hors ligne |
+| Topologie | Vietoris-Rips (GF(2), moteur RATISS) | Association de counts, `P_sig` |
+| Sidecar | `TopologicalQubit` (moteur RATISS, corrigé) | Variables topologiques logicielles séparées |
+| Visualisation | Matplotlib | Figures dérivées exclusivement des artefacts JSON |
+| Tests | pytest | Contrats de données et règle du Reality Flag |
+| Artefacts | JSON versionné | `ratiss.grover.sidecar.v1`, `ratiss.grover.reality_mode.v1` |
+
+Le moteur topologique source ([`ratiss-topological-decoherence-engine`](https://github.com/evinajonathan13-max/ratiss-topological-decoherence-engine)) est une dépendance **explicite par chemin local** — la provenance reste visible.
+
+## 7. Exécution et reproduction
 
 ```bash
 git clone https://github.com/evinajonathan13-max/Algorithmes-quantique-Ratiss-labs-.git
@@ -77,35 +114,61 @@ git clone https://github.com/evinajonathan13-max/ratiss-topological-decoherence-
 cd Algorithmes-quantique-Ratiss-labs-
 python3 -m pip install -e .
 
+# Expérience 1 : Grover + sidecar
 PYTHONPATH=../ratiss-topological-decoherence-engine/src \
 python3 scripts/run_grover_ratiss.py \
   --engine-src ../ratiss-topological-decoherence-engine/src \
   --output artifacts/grover_ratiss.json --shots 512
 
+# Expérience 2 : Reality Mode nominal (seuil 0.15)
 PYTHONPATH=../ratiss-topological-decoherence-engine/src \
 python3 scripts/run_grover_reality_mode.py \
   --engine-src ../ratiss-topological-decoherence-engine/src \
   --output artifacts/grover_reality_mode.json --shots 512
-```
 
-## Tests
+# Expérience 2 bis : scénario de sensibilité (seuil 0.02)
+PYTHONPATH=../ratiss-topological-decoherence-engine/src \
+python3 scripts/run_grover_reality_mode.py \
+  --engine-src ../ratiss-topological-decoherence-engine/src \
+  --output artifacts/grover_reality_mode_sensitivity.json \
+  --reality-flag-lct-threshold 0.02
 
-```bash
-PYTHONPATH=../ratiss-topological-decoherence-engine/src python3 -m pytest -q
+# Figures dérivées des seuls artefacts
 python3 scripts/generate_docs_figures.py
 ```
 
-Les tests vérifient que le circuit construit reste à trois qubits avec trois mesures et que la masse marquée est dérivée des counts fournis, non d’une constante attendue.
+Deux exécutions successives du même artefact produisent un contenu **bit-pour-bit identique**.
 
-## Documentation du laboratoire
+## 8. Tests
 
-| Document | Ce qu’il apporte |
+```bash
+PYTHONPATH=../ratiss-topological-decoherence-engine/src python3 -m pytest -q
+```
+
+Les tests vérifient que le circuit reste à trois qubits avec trois mesures, que la masse marquée est dérivée des counts fournis (non d'une constante), que les artefacts conservent les sorties brutes, et que le Reality Flag suit exactement la règle déclarée `divergence > seuil` dans les deux scénarios.
+
+## 9. Documentation du laboratoire
+
+| Document | Ce qu'il apporte |
 |---|---|
-| [`PROTOCOL.md`](docs/PROTOCOL.md) | Construction de l’oracle et comparaisons autorisées |
+| [`PROTOCOL.md`](docs/PROTOCOL.md) | Construction de l'oracle et comparaisons autorisées |
 | [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Séparation Grover / sidecar RATISS |
-| [`RESULTS.md`](docs/RESULTS.md) | Observations exactes de la première exécution |
+| [`RESULTS.md`](docs/RESULTS.md) | Observations exactes de l'exécution courante |
 | [`VISUAL_AUDIT.md`](docs/VISUAL_AUDIT.md) | Validation de lecture des graphiques |
 | [`REALITY_MODE.md`](docs/REALITY_MODE.md) | Contrat du faux backend, Reality Flag et scénarios de seuil |
-| [`REALITY_MODE_VISUAL_AUDIT.md`](docs/REALITY_MODE_VISUAL_AUDIT.md) | Vérification des nouveaux graphiques Reality Mode |
+| [`REALITY_MODE_VISUAL_AUDIT.md`](docs/REALITY_MODE_VISUAL_AUDIT.md) | Vérification des graphiques Reality Mode |
 
-Distribué sous [licence MIT](LICENSE).
+## 10. Citation et licence
+
+Distribué sous [licence MIT](LICENSE) — © 2026 Jonathan Evina.
+
+```bibtex
+@software{evina_ratiss_labs_grover_2026,
+  author  = {Evina, Jonathan},
+  title   = {Algorithmes quantiques RATISS Labs: Reproducible Grover
+             and RATISS Logical-Sidecar Experiments},
+  year    = {2026},
+  url     = {https://github.com/evinajonathan13-max/Algorithmes-quantique-Ratiss-labs-},
+  note    = {Simulation locale reproductible ; aucune exécution sur matériel.}
+}
+```

@@ -30,5 +30,15 @@ def test_reality_mode_keeps_fake_backend_scope_and_separate_sensitivity_flag():
     assert len(nominal["stages"]) == 3
     assert all(sum(stage["observed_counts"].values()) == 512 for stage in nominal["stages"])
     assert all(stage["observed_counts_association"]["P_sig"] == 0.0 for stage in nominal["stages"])
-    assert not any(stage["reality_flag"]["triggered"] for stage in nominal["stages"])
+    # La règle du flag est ce qui est contractualisé : il se déclenche quand
+    # la divergence calculée dépasse strictement le seuil déclaré. Depuis la
+    # correction du sidecar (moteur PR #1 : cycles dégénérés, géométrie
+    # dilatante, bruit 0.2), le scénario nominal 0.15 se déclenche réellement
+    # aux itérations 1 et 2 — ce résultat corrigé est conservé, pas masqué.
+    for document in (nominal, sensitivity):
+        for stage in document["stages"]:
+            flag = stage["reality_flag"]
+            assert flag["triggered"] == (flag["lct_divergence"] > flag["threshold"])
+    assert nominal["provenance"]["profile"]["reality_flag_lct_threshold"] == 0.15
+    assert sensitivity["provenance"]["profile"]["reality_flag_lct_threshold"] == 0.02
     assert sensitivity["stages"][-1]["reality_flag"]["triggered"] is True

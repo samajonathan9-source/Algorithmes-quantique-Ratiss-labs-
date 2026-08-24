@@ -20,8 +20,8 @@ Le flag est levé seulement quand cette valeur strictement calculée dépasse le
 
 | Profil | Seuil LCT | Flags observés | Lecture autorisée |
 |---|---:|---|---|
-| Nominal | 0.15 | Aucun | Les divergences restent sous le seuil choisi. |
-| Sensibilité | 0.02 | Itération 2 | La divergence `0.0436962248` franchit ce seuil de scénario. |
+| Nominal | 0.15 | Itérations 1 et 2 | Depuis la correction du sidecar (moteur PR #1), la divergence calculée (`0.169988`, `0.526472`) franchit ce seuil. |
+| Sensibilité | 0.02 | Itérations 1 et 2 | Le même franchissement est conservé sous ce seuil plus bas. |
 
 Le flag ne déclare pas une anomalie réelle, une dérive IBM ou une correction d’erreur. Il marque une différence dans la simulation locale et indique la frontière d’itération où elle a été observée.
 
