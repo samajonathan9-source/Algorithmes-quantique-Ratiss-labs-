@@ -112,6 +112,10 @@ IBM_QUANTUM_TOKEN=... python3 scripts/run_grover_qpu_validation.py \
 
 > **Lecture honnête.** À l'itération 2, le QPU réel `ibm_marrakesh` atteint une masse marquée `0.727` — **supérieure** à la simulation Aer bruitée (`0.678`). Le matériel réel converge mieux vers l'état marqué que le canal dépolarisant `p=0.02` d'Aer : le bruit matériel réel est, sur ce circuit et ce backend, moins dégradant que le modèle de bruit déclaré. Les divergences LCT restent sous le seuil nominal `0.15` aux trois itérations. Trois Job IDs traçables sont conservés dans l'artéfact : `da5uajeaa69c739latgg`, `da5uituaa69c739lb6m0`, `da5ujreaa69c739lb7m0`.
 
+### Diagnostic classique des counts
+
+Un diagnostic classique (Shannon + TVD) complète la masse dominante. À l'itération 2, le **TVD du QPU réel** (`0.273`) est plus bas que celui d'Aer (`0.322`) : la distribution complète du matériel réel diverge moins de l'idéal que la simulation, pas seulement la masse marquée. Ce diagnostic est étiqueté `classical_counts_diagnostic_not_quantum_entropy` — l'entropie de Shannon des counts n'est pas l'entropie de von Neumann, et `ETH` ne peut pas être approximé à partir de counts sans tomographie (explosion exponentielle refusée).
+
 ## 7. Pile technologique
 
 | Couche | Technologie | Rôle |
