@@ -33,11 +33,12 @@
 3. [Expérience 1 — Grover et sidecar RATISS](#3-expérience-1--grover-et-sidecar-ratiss)
 4. [Expérience 2 — Reality Mode hardware-aware](#4-expérience-2--reality-mode-hardware-aware)
 5. [Correction de sidecar et régénération](#5-correction-de-sidecar-et-régénération)
-6. [Pile technologique](#6-pile-technologique)
-7. [Exécution et reproduction](#7-exécution-et-reproduction)
-8. [Tests](#8-tests)
-9. [Documentation du laboratoire](#9-documentation-du-laboratoire)
-10. [Citation et licence](#10-citation-et-licence)
+6. [Expérience 3 — Validation contre un QPU IBM réel](#6-expérience-3--validation-contre-un-qpu-ibm-réel)
+7. [Pile technologique](#7-pile-technologique)
+8. [Exécution et reproduction](#8-exécution-et-reproduction)
+9. [Tests](#9-tests)
+10. [Documentation du laboratoire](#10-documentation-du-laboratoire)
+11. [Citation et licence](#11-citation-et-licence)
 
 ---
 
@@ -91,7 +92,27 @@ Le moniteur reçoit les counts observés, construit une association de counts RA
 
 > **Transparence de laboratoire.** Les artefacts précédents affichaient une signature sidecar initiale de `1.214413`. Cette valeur provenait d'un bug connu du `TopologicalQubit` — des cycles dégénérés (naissance ≈ mort, ~1e-16) comptés comme persistants — corrigé dans le moteur ([PR #1](https://github.com/evinajonathan13-max/ratiss-topological-decoherence-engine/pull/1) : tolérance `1e-9`, géométrie dilatante twist 0→π, amplitude de bruit `0.2`). L'anneau compact non tordu donne désormais `P_sig ≈ 0.18`, et le sidecar réagit réellement à la dégradation mesurée. Tous les artefacts de ce dépôt ont été régénérés avec le moteur corrigé ; les valeurs ci-dessus sont les valeurs corrigées, conservées sans ajustement.
 
-## 6. Pile technologique
+## 6. Expérience 3 — Validation contre un QPU IBM réel
+
+Le Reality Mode hors ligne (`FakeSherbrooke`, §4) reste la référence reproductible sans réseau. Une seconde validation soumet les **trois itérations** du circuit Grover (`oracle |111⟩`) à un **vrai backend IBM** et compare la divergence LCT entre la simulation Aer locale et le résultat matériel réel. L'artéfact [`artifacts/grover_qpu_validation.json`](artifacts/grover_qpu_validation.json) conserve les **Job IDs traçables** par itération, les counts matériels et le Reality Flag calculé contre le matériel réel.
+
+```bash
+IBM_QUANTUM_TOKEN=... python3 scripts/run_grover_qpu_validation.py \
+  --engine-src ../ratiss-topological-decoherence-engine/src \
+  --backend ibm_marrakesh --shots 512
+```
+
+> **Frontière de revendication.** Le Reality Flag compare la simulation Aer au matériel réel ; il ne certifie pas le matériel et n'est pas un diagnostic d'anomalie IBM. Le **couplage LCT-ETH n'est pas appliqué ici** : il requiert une matrice densité (disponible dans [COSMOS](https://github.com/evinajonathan13-max/QPU-Ratiss-COSMOS), pas dans des counts Grover). C'est la frontière transdisciplinaire honnête entre les deux laboratoires. Le token IBM est lu uniquement depuis la variable d'environnement `IBM_QUANTUM_TOKEN` ; il n'est jamais écrit dans l'artéfact, le dépôt ni aucun log.
+
+| Itération | Masse idéale | Masse Aer bruitée | Masse **QPU réel** | Divergence Aer | Divergence QPU | Reality Flag (0.15) |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 0.125 | 0.107 | 0.139 | 0.000000 | 0.000000 | Non |
+| 1 | 0.781 | 0.670 | 0.676 | 0.003899 | 0.003493 | Non |
+| 2 | 0.945 | 0.678 | **0.727** | 0.109358 | 0.059000 | Non |
+
+> **Lecture honnête.** À l'itération 2, le QPU réel `ibm_marrakesh` atteint une masse marquée `0.727` — **supérieure** à la simulation Aer bruitée (`0.678`). Le matériel réel converge mieux vers l'état marqué que le canal dépolarisant `p=0.02` d'Aer : le bruit matériel réel est, sur ce circuit et ce backend, moins dégradant que le modèle de bruit déclaré. Les divergences LCT restent sous le seuil nominal `0.15` aux trois itérations. Trois Job IDs traçables sont conservés dans l'artéfact : `da5uajeaa69c739latgg`, `da5uituaa69c739lb6m0`, `da5ujreaa69c739lb7m0`.
+
+## 7. Pile technologique
 
 | Couche | Technologie | Rôle |
 |---|---|---|
@@ -106,7 +127,7 @@ Le moniteur reçoit les counts observés, construit une association de counts RA
 
 Le moteur topologique source ([`ratiss-topological-decoherence-engine`](https://github.com/evinajonathan13-max/ratiss-topological-decoherence-engine)) est une dépendance **explicite par chemin local** — la provenance reste visible.
 
-## 7. Exécution et reproduction
+## 8. Exécution et reproduction
 
 ```bash
 git clone https://github.com/evinajonathan13-max/Algorithmes-quantique-Ratiss-labs-.git
@@ -139,7 +160,7 @@ python3 scripts/generate_docs_figures.py
 
 Deux exécutions successives du même artefact produisent un contenu **bit-pour-bit identique**.
 
-## 8. Tests
+## 9. Tests
 
 ```bash
 PYTHONPATH=../ratiss-topological-decoherence-engine/src python3 -m pytest -q
@@ -147,7 +168,7 @@ PYTHONPATH=../ratiss-topological-decoherence-engine/src python3 -m pytest -q
 
 Les tests vérifient que le circuit reste à trois qubits avec trois mesures, que la masse marquée est dérivée des counts fournis (non d'une constante), que les artefacts conservent les sorties brutes, et que le Reality Flag suit exactement la règle déclarée `divergence > seuil` dans les deux scénarios.
 
-## 9. Documentation du laboratoire
+## 10. Documentation du laboratoire
 
 | Document | Ce qu'il apporte |
 |---|---|
@@ -158,7 +179,7 @@ Les tests vérifient que le circuit reste à trois qubits avec trois mesures, qu
 | [`REALITY_MODE.md`](docs/REALITY_MODE.md) | Contrat du faux backend, Reality Flag et scénarios de seuil |
 | [`REALITY_MODE_VISUAL_AUDIT.md`](docs/REALITY_MODE_VISUAL_AUDIT.md) | Vérification des graphiques Reality Mode |
 
-## 10. Citation et licence
+## 11. Citation et licence
 
 Distribué sous [licence MIT](LICENSE) — © 2026 Jonathan Evina.
 

@@ -22,6 +22,25 @@ def test_grover_documentation_figures_exist():
     assert (assets / "grover-hardware-aware.png").is_file()
 
 
+def test_grover_qpu_validation_artifact_is_real_hardware_with_traceable_jobs():
+    import os
+    document_path = ROOT / "artifacts" / "grover_qpu_validation.json"
+    if not document_path.is_file():
+        import pytest
+        pytest.skip("grover_qpu_validation.json absent (requires IBM_QUANTUM_TOKEN to regenerate)")
+    document = json.loads(document_path.read_text(encoding="utf-8"))
+    assert document["schema"] == "ratiss.grover.qpu_validation.v1"
+    assert document["provenance"]["validated_on_hardware"] is True
+    assert len(document["provenance"]["job_ids"]) == len(document["stages"])
+    for stage in document["stages"]:
+        flag = stage["reality_flag"]
+        assert flag["triggered"] == (flag["lct_divergence"] > flag["threshold"])
+    raw = document_path.read_text(encoding="utf-8")
+    assert "IBM_QUANTUM_TOKEN" not in raw
+    token = os.environ.get("IBM_QUANTUM_TOKEN", "")
+    assert token == "" or token not in raw
+
+
 def test_reality_mode_keeps_fake_backend_scope_and_separate_sensitivity_flag():
     nominal = json.loads((ROOT / "artifacts" / "grover_reality_mode.json").read_text(encoding="utf-8"))
     sensitivity = json.loads((ROOT / "artifacts" / "grover_reality_mode_sensitivity.json").read_text(encoding="utf-8"))
